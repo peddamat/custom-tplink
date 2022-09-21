@@ -5,7 +5,7 @@ from typing import Final
 
 from homeassistant.const import Platform
 
-DOMAIN = "tplink"
+DOMAIN = "custom_tplink"
 
 ATTR_CURRENT_A: Final = "current_a"
 ATTR_CURRENT_POWER_W: Final = "current_power_w"
