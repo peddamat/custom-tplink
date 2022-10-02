@@ -1,6 +1,8 @@
 """Support for TPLink HS100/HS110/HS200 smart switch energy sensors."""
 from __future__ import annotations
 
+import logging
+
 from dataclasses import dataclass
 from typing import cast
 
@@ -34,6 +36,7 @@ from .const import (
 from .coordinator import TPLinkDataUpdateCoordinator
 from .entity import CoordinatedTPLinkEntity
 
+_LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class TPLinkSensorEntityDescription(SensorEntityDescription):
@@ -108,6 +111,7 @@ def async_emeter_from_device(
     return None if device.is_bulb else 0.0
 
 
+# This is where detected sensors are setup... -sp
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -117,6 +121,11 @@ async def async_setup_entry(
     coordinator: TPLinkDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
     entities: list[SmartPlugSensor] = []
     parent = coordinator.device
+
+    supported_modules = parent.supported_modules
+    for m in supported_modules:
+        _LOGGER.debug("Found module: %s", m)
+
     if not parent.has_emeter:
         return
 
