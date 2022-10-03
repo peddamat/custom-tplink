@@ -3,7 +3,7 @@
   "name": "Custom TP-Link Kasa Smart",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/tplink",
-  "requirements": ["git+https://github.com/peddamat/python-kasa.git@master#python-kasa==0.1"],
+  "requirements": ["git+https://github.com/peddamat/python-kasa.git@master#python-kasa==4.1"],
   "codeowners": ["@rytilahti", "@thegardenmonkey"],
   "dependencies": ["network"],
   "quality_scale": "platinum",
