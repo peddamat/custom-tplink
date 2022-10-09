@@ -124,7 +124,7 @@ async def async_setup_entry(
 
     supported_modules = parent.supported_modules
     for m in supported_modules:
-        _LOGGER.debug("Found module: %s", m)
+        _LOGGER.info("Found module: %s", m)
 
     if not parent.has_emeter:
         return
