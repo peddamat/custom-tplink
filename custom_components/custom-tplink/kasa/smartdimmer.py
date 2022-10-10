@@ -46,7 +46,7 @@ class SmartDimmer(SmartPlug):
         self.add_module("motion", Motion(self, "smartlife.iot.PIR"))
         self.add_module("ambient", AmbientLight(self, "smartlife.iot.LAS"))
 
-    @property  # type: ignore
+    @property
     @requires_update
     def current_brightness(self) -> int:
         """Return current ambient sensor brightness."""
