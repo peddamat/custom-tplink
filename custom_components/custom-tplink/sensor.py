@@ -20,6 +20,7 @@ from homeassistant.const import (
     ELECTRIC_CURRENT_AMPERE,
     ELECTRIC_POTENTIAL_VOLT,
     ENERGY_KILO_WATT_HOUR,
+    LIGHT_LUX,
     POWER_WATT,
 )
 from homeassistant.core import HomeAssistant
@@ -93,6 +94,31 @@ ENERGY_SENSORS: tuple[TPLinkSensorEntityDescription, ...] = (
     ),
 )
 
+LUX_SENSORS: tuple[TPLinkSensorEntityDescription, ...] = (
+    TPLinkSensorEntityDescription(
+        key=ATTR_CURRENT_POWER_W,
+        native_unit_of_measurement=LIGHT_LUX,
+        device_class=SensorDeviceClass.ILLUMINANCE,
+        state_class=SensorStateClass.MEASUREMENT,
+        name="Light Lux",
+        emeter_attr="power",
+        precision=1,
+    ),
+)
+
+def async_luxmeter_from_device(
+    device: SmartDevice, description: TPLinkSensorEntityDescription
+) -> float | None:
+    """Map a sensor key to the device attribute."""
+    if attr := description.emeter_attr:
+        if (val := getattr(device.current_brightness, attr)) is None:
+            _LOGGER.debug("Current brightness returned None.")
+            return None
+        _LOGGER.debug("Yay!")
+        return round(cast(float, val), description.precision)
+
+    return None
+
 
 def async_emeter_from_device(
     device: SmartDevice, description: TPLinkSensorEntityDescription
@@ -125,28 +151,34 @@ async def async_setup_entry(
     supported_modules = parent.supported_modules
     for m in supported_modules:
         _LOGGER.debug("Found module: %s", m)
-
-    # Motion sensor is 'motion'
-    # Ambient light sensor is 'ambient'
+        # Motion sensor is 'motion'
+        # Ambient light sensor is 'ambient'
+    
     if parent.is_dimmable:
         _LOGGER.debug("Found a dimmer switch.")
+        def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
+            return [
+                SmartPlugSensor(device, coordinator, description)
+                for description in LUX_SENSORS
+                if async_luxmeter_from_device(device, description) is not None
+            ]
 
-    if not parent.has_emeter:
-        return
-
-    def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
-        return [
-            SmartPlugSensor(device, coordinator, description)
-            for description in ENERGY_SENSORS
-            if async_emeter_from_device(device, description) is not None
-        ]
-
-    if parent.is_strip:
-        # Historically we only add the children if the device is a strip
-        for child in parent.children:
-            entities.extend(_async_sensors_for_device(child))
-    else:
         entities.extend(_async_sensors_for_device(parent))
+
+    if parent.has_emeter:
+        def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
+            return [
+                SmartPlugSensor(device, coordinator, description)
+                for description in ENERGY_SENSORS
+                if async_emeter_from_device(device, description) is not None
+            ]
+
+        if parent.is_strip:
+            # Historically we only add the children if the device is a strip
+            for child in parent.children:
+                entities.extend(_async_sensors_for_device(child))
+        else:
+            entities.extend(_async_sensors_for_device(parent))
 
     async_add_entities(entities)
 
