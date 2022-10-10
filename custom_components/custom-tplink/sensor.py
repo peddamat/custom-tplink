@@ -111,7 +111,7 @@ def async_luxmeter_from_device(
 ) -> float | None:
     """Map a sensor key to the device attribute."""
     if attr := description.emeter_attr:
-        if (val := getattr(device.current_brightness, attr)) is None:
+        if (val := device.current_brightness()) is None:
             _LOGGER.debug("Current brightness returned None.")
             return None
         _LOGGER.debug("Yay!")
