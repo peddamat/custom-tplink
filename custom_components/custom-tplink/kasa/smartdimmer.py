@@ -43,8 +43,14 @@ class SmartDimmer(SmartPlug):
         self._device_type = DeviceType.Dimmer
         # TODO: need to be verified if it's okay to call these on HS220 w/o these
         # TODO: need to be figured out what's the best approach to detect support for these
-        # self.add_module("motion", Motion(self, "smartlife.iot.PIR"))
-        # self.add_module("ambient", AmbientLight(self, "smartlife.iot.LAS"))
+        self.add_module("motion", Motion(self, "smartlife.iot.PIR"))
+        self.add_module("ambient", AmbientLight(self, "smartlife.iot.LAS"))
+
+    @property  # type: ignore
+    @requires_update
+    def current_brightness(self) -> int:
+        """Return current ambient sensor brightness."""
+        return self.modules["ambient"].current_brightness
 
     @property  # type: ignore
     @requires_update
