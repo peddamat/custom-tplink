@@ -126,6 +126,11 @@ async def async_setup_entry(
     for m in supported_modules:
         _LOGGER.debug("Found module: %s", m)
 
+    # Motion sensor is 'motion'
+    # Ambient light sensor is 'ambient'
+    if parent.is_dimmable:
+        _LOGGER.debug("Found a dimmer switch.")
+
     if not parent.has_emeter:
         return
 
