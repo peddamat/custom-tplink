@@ -466,6 +466,16 @@ class SmartDevice:
 
     @property  # type: ignore
     @requires_update
+    def current_brightness(self) -> int:
+        """Return current ambient sensor brightness."""
+        return self.modules["ambient"].current_brightness
+
+    async def get_current_brightness(self) -> int:
+        """Retrieve current ambient sensor brightness."""
+        return await self.modules["ambient"].current_brightness()
+
+    @property  # type: ignore
+    @requires_update
     def emeter_realtime(self) -> EmeterStatus:
         """Return current energy readings."""
         self._verify_emeter()
