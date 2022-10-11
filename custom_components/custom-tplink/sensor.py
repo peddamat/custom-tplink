@@ -159,7 +159,7 @@ async def async_setup_entry(
         _LOGGER.debug("Found a dimmer switch.")
         def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
             return [
-                SmartPlugSensor(device, coordinator, description)
+                SmartPlugLuxSensor(device, coordinator, description)
                 for description in LUX_SENSORS
                 if async_luxmeter_from_device(device, description) is not None
             ]
@@ -214,3 +214,13 @@ class SmartPlugSensor(CoordinatedTPLinkEntity, SensorEntity):
     def native_value(self) -> float | None:
         """Return the sensors state."""
         return async_emeter_from_device(self.device, self.entity_description)
+
+class SmartPlugLuxSensor(SmartPlugSensor):
+
+    def __init__(self, a, b):
+        super().__init__(a, b)
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the sensors state."""
+        return async_luxmeter_from_device(self.device, self.entity_description)
