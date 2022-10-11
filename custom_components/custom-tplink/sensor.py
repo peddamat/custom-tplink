@@ -166,20 +166,20 @@ async def async_setup_entry(
 
         entities.extend(_async_sensors_for_device(parent))
 
-    if parent.has_emeter:
-        def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
-            return [
-                SmartPlugSensor(device, coordinator, description)
-                for description in ENERGY_SENSORS
-                if async_emeter_from_device(device, description) is not None
-            ]
+    # if parent.has_emeter:
+    #     def _async_sensors_for_device(device: SmartDevice) -> list[SmartPlugSensor]:
+    #         return [
+    #             SmartPlugSensor(device, coordinator, description)
+    #             for description in ENERGY_SENSORS
+    #             if async_emeter_from_device(device, description) is not None
+    #         ]
 
-        if parent.is_strip:
-            # Historically we only add the children if the device is a strip
-            for child in parent.children:
-                entities.extend(_async_sensors_for_device(child))
-        else:
-            entities.extend(_async_sensors_for_device(parent))
+    #     if parent.is_strip:
+    #         # Historically we only add the children if the device is a strip
+    #         for child in parent.children:
+    #             entities.extend(_async_sensors_for_device(child))
+    #     else:
+    #         entities.extend(_async_sensors_for_device(parent))
 
     async_add_entities(entities)
 
